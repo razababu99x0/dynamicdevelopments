@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import {
-  Crown, Zap, Smartphone, Code2, Cpu, Target, Network, LifeBuoy,
+  Crown, Zap, Smartphone, Code2, Cpu, Target, Network, LifeBuoy, Bot, ArrowUpRight,
 } from "lucide-react";
 import { SectionHead, Reveal, CountUp } from "./Effects";
 import Logo from "./Logo";
@@ -67,7 +67,7 @@ function Stats() {
               transition={{ delay: i * 0.08, duration: 0.6 }}
             >
               {s.prefix}
-              {s.suffix !== "" ? <CountUp value={parseInt(s.value)} suffix={s.suffix} /> : s.value}
+              {s.value && (s.suffix ? <CountUp value={Number(s.value)} suffix={s.suffix} /> : s.value)}
             </motion.span>
             <span className="mt-2 font-mono text-[9px] tracking-[0.25em] text-white/40">{s.label.toUpperCase()}</span>
           </div>
@@ -109,8 +109,8 @@ function TechOrbit() {
         sub="An ecosystem of production-grade tools, orchestrated around your project."
       />
 
-      <div className="mt-10 flex justify-center">
-        <div className="relative h-[620px] w-[620px] scale-[0.52] sm:scale-[0.72] lg:scale-100">
+      <div className="tech-orbit-stage mt-10">
+        <div className="tech-orbit-canvas relative h-[620px] w-[620px]">
           {/* ambient depth */}
           <div className="absolute inset-0 rounded-full" style={{ background: "radial-gradient(circle, rgba(139,92,255,.09), transparent 62%)" }} />
 
@@ -226,11 +226,53 @@ function About() {
   );
 }
 
+const EXPERTISE = [
+  { icon: Code2, title: "Web Development", detail: "Responsive websites and custom web applications built around your business.", tags: ["React", "TypeScript", "Full-stack"] },
+  { icon: Cpu, title: "Interactive 3D", detail: "Immersive product experiences with thoughtful motion and real-time visuals.", tags: ["Three.js", "WebGL", "Motion"] },
+];
+
+function Skills() {
+  return (
+    <section id="skills" aria-labelledby="skills-title" className="relative z-10 mx-auto max-w-6xl px-6 py-20 md:py-28">
+      <div className="mb-10 flex flex-wrap items-end justify-between gap-6">
+        <div>
+          <p className="font-mono text-xs tracking-[0.25em] text-cyan">SKILLS &amp; EXPERTISE</p>
+          <h2 id="skills-title" className="mt-4 font-display text-4xl font-bold leading-tight text-ice md:text-5xl">Built with skill.<br /><span className="text-gradient">Powered by intelligence.</span></h2>
+        </div>
+        <p className="max-w-sm text-sm leading-7 text-soft">Design, engineering and AI — connected to create useful digital experiences.</p>
+      </div>
+      <div className="grid gap-4 md:grid-cols-2">
+        <article className="expertise-feature grad-border relative overflow-hidden rounded-3xl p-7 md:row-span-2 md:p-10">
+          <div aria-hidden="true" className="absolute -right-16 -top-16 h-60 w-60 rounded-full bg-cyan/10 blur-3xl" />
+          <div className="relative flex items-center justify-between gap-4">
+            <span className="flex h-14 w-14 items-center justify-center rounded-2xl border border-cyan/25 bg-cyan/10 text-cyan"><Bot size={28} aria-hidden="true" /></span>
+            <span className="rounded-full border border-lime/25 bg-lime/10 px-3 py-1.5 font-mono text-[10px] tracking-widest text-lime">INTELLIGENT SOLUTIONS</span>
+          </div>
+          <h3 className="relative mt-9 font-display text-4xl font-bold text-ice">AI Expert</h3>
+          <p className="relative mt-4 max-w-md text-base leading-7 text-soft">AI-powered websites, conversational assistants and automation workflows that make everyday work simpler.</p>
+          <ul aria-label="AI skills" className="relative mt-7 flex flex-wrap gap-2">
+            {["AI integration", "AI agents", "Prompt engineering", "Workflow automation"].map(skill => <li key={skill} className="rounded-full border border-white/15 bg-white/5 px-3 py-2 text-xs text-ice">{skill}</li>)}
+          </ul>
+          <a href="#contact" className="relative mt-9 inline-flex min-h-11 items-center gap-2 font-semibold text-cyan">Discuss an AI project <ArrowUpRight size={18} aria-hidden="true" /></a>
+        </article>
+        {EXPERTISE.map(({ icon: Icon, title, detail, tags }) => (
+          <article key={title} className="expertise-card glass rounded-3xl p-7">
+            <div className="flex items-center gap-3"><Icon size={22} className="text-cyan" aria-hidden="true" /><h3 className="font-display text-xl font-semibold text-ice">{title}</h3></div>
+            <p className="mt-3 text-sm leading-7 text-soft">{detail}</p>
+            <p className="mt-5 font-mono text-xs text-teal">{tags.join(" / ")}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 export default function UniverseSection() {
   return (
     <>
       <WhyUs />
       <Stats />
+      <Skills />
       <TechOrbit />
       <About />
     </>

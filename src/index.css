@@ -324,3 +324,17 @@ body {
 }
 input, select, textarea { outline: none; }
 select option { background: #080e24; color: #f4f8ff; }
+
+/* Refined expertise surfaces and responsive orbital composition. */
+.expertise-feature { background: linear-gradient(145deg, #11253b, #0a142b 55%, #191335); box-shadow: 0 24px 80px #02061066; }
+.expertise-card { transition: border-color .25s ease, transform .25s ease; }
+.expertise-card:hover { border-color: #25e3ff55; transform: translateY(-3px); }
+.tech-orbit-stage { position: relative; height: 340px; }
+.tech-orbit-canvas { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%) scale(.44); transform-origin: center; }
+@media (min-width: 400px) { .tech-orbit-canvas { transform: translate(-50%, -50%) scale(.52); } }
+@media (min-width: 640px) { .tech-orbit-stage { height: 480px; } .tech-orbit-canvas { transform: translate(-50%, -50%) scale(.72); } }
+@media (min-width: 1024px) { .tech-orbit-stage { height: 640px; } .tech-orbit-canvas { transform: translate(-50%, -50%); } }
+section[id] { scroll-margin-top: 110px; }
+h1, h2, h3 { text-wrap: balance; }
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px solid var(--color-cyan); outline-offset: 5px; }
+@media (prefers-reduced-motion: reduce) { .expertise-card { transition: none; } .expertise-card:hover { transform: none; } .tech-orbit-stage * { animation: none !important; } }
