@@ -2,9 +2,10 @@ import { Component, useEffect, useRef, useState, type ReactNode } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import type { Group } from 'three';
+function Fallback(){return <div className="scene-fallback fallback-3d" aria-label="Animated orbital sculpture"><div className="fallback-sculpture">{Array.from({length:9},(_,i)=><i key={i} style={{transform:`rotateY(${i*20}deg) rotateX(35deg)`}}/>)}<span/></div></div>}
 class Boundary extends Component<{children:ReactNode},{failed:boolean}> {
  state={failed:false}; static getDerivedStateFromError(){return {failed:true}}
- render(){return this.state.failed?<div className="scene-fallback">DD</div>:this.props.children}
+ render(){return this.state.failed?<Fallback/>:this.props.children}
 }
 function Sculpture({color,moving}:{color:string;moving:boolean}){
  const ref=useRef<Group>(null);
@@ -13,6 +14,8 @@ function Sculpture({color,moving}:{color:string;moving:boolean}){
 }
 export default function StudioScene({color,moving}:{color:string;moving:boolean}){
  const wrap=useRef<HTMLDivElement>(null),[visible,setVisible]=useState(true);
+ const [supported]=useState(()=>{try{const canvas=document.createElement('canvas');const gl=canvas.getContext('webgl2');if(!gl)return false;gl.getExtension('WEBGL_lose_context')?.loseContext();return true}catch{return false}});
  useEffect(()=>{const el=wrap.current;if(!el)return;const io=new IntersectionObserver(([e])=>setVisible(e.isIntersecting));io.observe(el);const fn=()=>setVisible(!document.hidden&&el.getBoundingClientRect().bottom>0);document.addEventListener('visibilitychange',fn);return()=>{io.disconnect();document.removeEventListener('visibilitychange',fn)}},[]);
- return <div ref={wrap} className="scene-canvas" role="img" aria-label="A rotating chrome knot with luminous orbital rings. Drag to rotate. Color and motion controls are below."><Boundary><Canvas camera={{position:[0,0,6.4],fov:46}} dpr={[1,1.5]} frameloop={visible&&moving?'always':'demand'} gl={{alpha:true,antialias:true}} fallback={<div className="scene-fallback">DD</div>}><ambientLight intensity={1.5}/><directionalLight position={[3,4,5]} intensity={5} color="#ebfaff"/><pointLight position={[-3,1,2]} intensity={35} color={color}/><pointLight position={[3,-2,1]} intensity={30} color="#638bff"/><Sculpture color={color} moving={visible&&moving}/><OrbitControls enableZoom={false} enablePan={false} enableDamping/></Canvas></Boundary></div>
+ if(!supported)return <Fallback/>;
+ return <div ref={wrap} className="scene-canvas" role="img" aria-label="A rotating chrome knot with luminous orbital rings. Drag to rotate. Color and motion controls are below."><Boundary><Canvas camera={{position:[0,0,6.4],fov:46}} dpr={[1,1.5]} frameloop={visible&&moving?'always':'demand'} gl={{alpha:true,antialias:true}} fallback={<Fallback/>}><ambientLight intensity={1.5}/><directionalLight position={[3,4,5]} intensity={5} color="#ebfaff"/><pointLight position={[-3,1,2]} intensity={35} color={color}/><pointLight position={[3,-2,1]} intensity={30} color="#638bff"/><Sculpture color={color} moving={visible&&moving}/><OrbitControls enableZoom={false} enablePan={false} enableDamping/></Canvas></Boundary></div>
 }
