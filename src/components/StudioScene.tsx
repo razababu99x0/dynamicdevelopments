@@ -1,10 +1,10 @@
 import { Component, useEffect, useRef, useState, type ReactNode } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
+import { Canvas, useFrame, useLoader } from '@react-three/fiber';
 import { OrbitControls, RoundedBox } from '@react-three/drei';
-import type { Group } from 'three';
+import { TextureLoader, SRGBColorSpace, type Group } from 'three';
 
 function Fallback() {
- return <div className="scene-fallback" role="img" aria-label="Desktop computer with a glowing development workspace"><svg viewBox="0 0 440 360" width="90%" height="90%" aria-hidden="true"><rect x="50" y="45" width="340" height="220" rx="16" fill="#222b35" stroke="#899aa7" strokeWidth="5"/><rect x="64" y="60" width="312" height="180" rx="7" fill="#0a131b"/><path d="M87 91h90M87 117h150M105 144h105M105 171h130M87 198h80" stroke="var(--signal, #c8ff32)" strokeWidth="7"/><rect x="273" y="94" width="79" height="107" rx="8" fill="#193645"/><path d="M198 266v35h-48v10h140v-10h-48v-35" fill="#899aa7"/><rect x="110" y="329" width="220" height="14" rx="6" fill="#647585"/></svg></div>;
+ return <div className="scene-fallback" role="img" aria-label="Desktop computer displaying the Dynamic Developments logo"><svg viewBox="0 0 440 360" width="90%" height="90%" aria-hidden="true"><rect x="50" y="45" width="340" height="220" rx="16" fill="#222b35" stroke="#899aa7" strokeWidth="5"/><rect x="64" y="60" width="312" height="180" rx="7" fill="#0a131b"/><image href="/favicon.svg" x="161" y="77" width="118" height="118"/><text x="220" y="222" textAnchor="middle" fill="#edf5ff" fontFamily="Arial, sans-serif" fontSize="14" letterSpacing="1.5">DYNAMIC DEVELOPMENTS</text><path d="M198 266v35h-48v10h140v-10h-48v-35" fill="#899aa7"/><rect x="110" y="329" width="220" height="14" rx="6" fill="#647585"/></svg></div>;
 }
 class Boundary extends Component<{children:ReactNode},{failed:boolean}> {
  state={failed:false}; static getDerivedStateFromError(){return {failed:true}}
@@ -12,6 +12,11 @@ class Boundary extends Component<{children:ReactNode},{failed:boolean}> {
 }
 function Box({position,size,color,metal=false}:{position:[number,number,number];size:[number,number,number];color:string;metal?:boolean}){
  return <RoundedBox position={position} args={size} radius={Math.min(.055,...size.map(x=>x/3))} smoothness={3}>{metal?<meshStandardMaterial color={color} metalness={.75} roughness={.28}/>:<meshBasicMaterial color={color}/>}</RoundedBox>;
+}
+function ScreenLogo(){
+ const texture=useLoader(TextureLoader,'/favicon.svg');
+ texture.colorSpace=SRGBColorSpace;
+ return <mesh position={[0,.43,.17]}><planeGeometry args={[1.28,1.28]}/><meshBasicMaterial map={texture} transparent toneMapped={false}/></mesh>;
 }
 function Computer({color,moving}:{color:string;moving:boolean}) {
  const group=useRef<Group>(null),time=useRef(0);
@@ -22,16 +27,7 @@ function Computer({color,moving}:{color:string;moving:boolean}) {
   <Box position={[0,.46,.137]} size={[3.12,1.8,.015]} color="#09131d"/>
   <Box position={[0,1.23,.153]} size={[3.05,.18,.012]} color="#202e3c"/>
   {['#ff847c','#f5c66a',color].map((c,i)=><mesh key={c+i} position={[-1.4+i*.12,1.23,.17]}><circleGeometry args={[.028,12]}/><meshBasicMaterial color={c}/></mesh>)}
-  <Box position={[-1.34,.36,.155]} size={[.27,1.42,.018]} color="#14222e"/>
-  {[.95,.76,.57,.38,.19].map((y,i)=><Box key={y} position={[-1.34,y,.173]} size={[.11,.035,.01]} color={i===0?color:'#52667a'}/>)}
-  {[1.04,.86,.68,.50,.32,.14,-.04,-.22].map((y,i)=><group key={y}>
-   <Box position={[-.99,y,.166]} size={[.07,.026,.012]} color="#4c6073"/>
-   <Box position={[-.57+(i%3)*.08,y,.166]} size={[.57+(i%3)*.15,.035,.012]} color={i%3===0?color:i%3===1?'#79c9ef':'#a5abc5'}/>
-  </group>)}
-  <Box position={[.95,.48,.161]} size={[.83,1.13,.018]} color="#172c39"/>
-  <Box position={[.95,.85,.179]} size={[.62,.18,.015]} color={color}/>
-  {[.59,.47,.35].map((y,i)=><Box key={y} position={[.95,y,.18]} size={[.60-i*.1,.035,.012]} color="#8298a7"/>)}
-  <Box position={[.95,.13,.18]} size={[.55,.16,.012]} color="#40708a"/>
+  <ScreenLogo/>
   <Box position={[0,-.52,.167]} size={[.24,.022,.012]} color={color}/>
   <Box position={[0,-1.02,-.04]} size={[.32,.68,.23]} color="#8b9cac" metal/>
   <Box position={[0,-1.35,.05]} size={[1.28,.10,.75]} color="#8293a4" metal/>
@@ -48,5 +44,5 @@ export default function StudioScene({color,moving}:{color:string;moving:boolean}
  const [supported]=useState(()=>{try{const canvas=document.createElement('canvas');const gl=canvas.getContext('webgl2');if(!gl)return false;gl.getExtension('WEBGL_lose_context')?.loseContext();return true}catch{return false}});
  useEffect(()=>{const el=wrap.current;if(!el)return;let intersecting=true;const update=()=>setVisible(intersecting&&!document.hidden);const io=new IntersectionObserver(([e])=>{intersecting=e.isIntersecting;update()});io.observe(el);document.addEventListener('visibilitychange',update);return()=>{io.disconnect();document.removeEventListener('visibilitychange',update)}},[]);
  if(!supported)return <Fallback/>;
- return <div ref={wrap} className="scene-canvas" role="img" aria-label="Floating 3D desktop computer with a glowing code editor, metal stand, keyboard and mouse. Drag to explore. Color and motion controls are below."><Boundary><Canvas camera={{position:[0,1.1,7.8],fov:42}} dpr={[1,1.5]} frameloop={visible&&moving?'always':'demand'} gl={{alpha:true,antialias:true}} fallback={<Fallback/>}><ambientLight intensity={1.5}/><directionalLight position={[3,4,5]} intensity={4} color="#ebfaff"/><pointLight position={[-3,1,2]} intensity={25} color={color}/><pointLight position={[3,-2,1]} intensity={20} color="#638bff"/><Computer color={color} moving={visible&&moving}/><OrbitControls enableZoom={false} enablePan={false} enableDamping minPolarAngle={Math.PI/3} maxPolarAngle={Math.PI/1.8}/></Canvas></Boundary></div>;
+ return <div ref={wrap} className="scene-canvas" role="img" aria-label="Floating 3D desktop computer displaying the Dynamic Developments logo, with metal stand, keyboard and mouse. Drag to explore. Color and motion controls are below."><Boundary><Canvas camera={{position:[0,1.1,7.8],fov:42}} dpr={[1,1.5]} frameloop={visible&&moving?'always':'demand'} gl={{alpha:true,antialias:true}} fallback={<Fallback/>}><ambientLight intensity={1.5}/><directionalLight position={[3,4,5]} intensity={4} color="#ebfaff"/><pointLight position={[-3,1,2]} intensity={25} color={color}/><pointLight position={[3,-2,1]} intensity={20} color="#638bff"/><Computer color={color} moving={visible&&moving}/><OrbitControls enableZoom={false} enablePan={false} enableDamping minPolarAngle={Math.PI/3} maxPolarAngle={Math.PI/1.8}/></Canvas></Boundary></div>;
 }
