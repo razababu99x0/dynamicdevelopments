@@ -1,5 +1,10 @@
+const previews: Record<string, {src:string;alt:string}> = {
+ physics: {src:'/physics-portfolio.jpg',alt:'Screenshot of the live Semester One physics book'},
+ bit: {src:'/bit-portfolio.jpg',alt:'Screenshot of the live BIT Ghosi institute website'},
+ vmart: {src:'/vmart-portfolio.jpg',alt:'Screenshot of the deployed V-Mart Siwan Edition Two storefront'},
+};
 export default function Preview({kind}:{kind:string}){
- if(kind==='physics')return <div className="project-art physics-art" aria-hidden="true"><div className="orbit-line"/><div className="orbit-line second"/><span className="formula f1">∇ · F</span><span className="formula f2">F = ma</span><div className="book-object"><span>AN INTERACTIVE EDITION</span><strong>The Living<br/>Physics<br/><em>Book.</em></strong><small>MATHEMATICAL PHYSICS<br/>& CLASSICAL MECHANICS</small><i>01 — SEMESTER ONE</i></div><span className="art-caption">LEARNING, IN ANOTHER DIMENSION.</span></div>;
- if(kind==='commerce')return <div className="project-art commerce-art" aria-hidden="true"><span className="mock-brand">FORM<span>Objects for everyday.</span></span><div className="vase vase-a"/><div className="vase vase-b"/><div className="mock-bottom"><strong>Less, but better.</strong><span>COLLECTION 01 ↗</span></div></div>;
- return <div className="project-art dashboard-art" aria-hidden="true"><div className="mock-dashboard"><aside>◈<i/><i/><i/><i/></aside><div><header>Orbit <span>WORKSPACE</span></header><small>YOUR OVERVIEW</small><strong>Room to do great work.</strong><div className="mock-metrics"><span>12<small>Projects</small></span><span>08<small>In progress</small></span><span>04<small>Delivered</small></span></div><div className="mock-bars">{[32,54,42,67,56,78,68,94,85,110,97,122].map((h,i)=><i key={i} style={{height:h}}/>)}</div><div className="mock-task">Website exploration <span>IN PROGRESS</span></div></div></div></div>
+ const preview=previews[kind];
+ if(!preview)return null;
+ return <div className="project-art" style={{padding:0,overflow:'hidden',background:'#101619'}}><img src={preview.src} alt={preview.alt} loading="lazy" decoding="async" width={1354} height={930} style={{width:'100%',height:'100%',objectFit:'cover',objectPosition:'top',display:'block'}}/></div>;
 }
